@@ -10,12 +10,23 @@ import { supabase, onAuthStateChange } from './supabase';
 import './App.css';
 
 function App() {
+  // Check if Supabase is configured
+  const supabaseConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
+
   // Auth state
-  const [authenticated, setAuthenticated] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(!supabaseConfigured); // Auto-authenticate if no Supabase
+  const [authLoading, setAuthLoading] = useState(supabaseConfigured); // Skip loading if no auth needed
 
   // Check for existing session on mount and subscribe to auth changes
   useEffect(() => {
+    // Skip auth entirely if Supabase is not configured
+    if (!supabaseConfigured) {
+      console.log('🔓 Running in anonymous mode (Supabase not configured)');
+      setAuthenticated(true);
+      setAuthLoading(false);
+      return;
+    }
+
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -39,7 +50,7 @@ function App() {
     });
 
     return unsubscribe;
-  }, []);
+  }, [supabaseConfigured]);
 
   // Conversations state
   const [conversations, setConversations] = useState([]);

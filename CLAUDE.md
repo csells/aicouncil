@@ -18,9 +18,7 @@ LLM Council is a multi-mode deliberation system where multiple LLMs collaborate 
 **Manual start:**
 ```bash
 # Backend (from project root)
-uv run python -m backend.main
-# OR
-python -m backend.main
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8001
 
 # Frontend (from project root)
 cd frontend && npm run dev
@@ -41,16 +39,15 @@ npm run lint         # Run ESLint
 ### Backend Commands
 ```bash
 # From project root
-python -m backend.main                # Run backend server
-uv run python -m backend.main         # Run with uv (recommended)
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8001    # Run backend server (recommended)
+uvicorn backend.main:app --host 0.0.0.0 --port 8001            # Without uv
 
 # Install dependencies
-pip install -r requirements.txt
-# OR with uv (if available)
-uv sync
+uv sync                               # Using uv (recommended)
+pip install -r requirements.txt       # Using pip
 ```
 
-**CRITICAL**: Always run backend as `python -m backend.main` from project root, NOT from inside the backend directory. This is required for Python's relative import system to work correctly.
+**CRITICAL**: The backend is designed for Vercel serverless deployment and does not have a `__main__` block. It must be run with `uvicorn backend.main:app`, NOT `python -m backend.main`.
 
 ## Architecture
 
